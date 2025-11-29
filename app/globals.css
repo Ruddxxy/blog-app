@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter);
+  --color-background: #ffffff;
+  --color-foreground: #000000;
+}
+
+/* Custom Utilities for Brutalist Design */
+@layer utilities {
+  .border-brutal {
+    @apply border border-black;
+  }
+  
+  .hover-inverse {
+    @apply transition-colors duration-0 ease-linear hover:bg-black hover:text-white;
+  }
+}
+
+/* Global Reset */
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure all borders are solid black by default if border width is set */
+*, ::before, ::after {
+  border-color: #000000;
+}
