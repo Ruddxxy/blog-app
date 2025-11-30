@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 
@@ -110,10 +111,17 @@ export async function verifyOtp(email: string, token: string, type: 'signup' | '
 
 export async function signInWithGoogle() {
     const supabase = await createClient()
+
+    // Force localhost in development to avoid production redirects
+    const isDev = process.env.NODE_ENV === 'development'
+    const origin = isDev ? 'http://localhost:3000' : (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000')
+
+    console.log('OAuth Origin:', origin)
+
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback?next=/dashboard?login=success`,
+            redirectTo: `${origin}/auth/callback?next=/dashboard?login=success`,
         },
     })
 
@@ -129,10 +137,17 @@ export async function signInWithGoogle() {
 
 export async function signInWithGithub() {
     const supabase = await createClient()
+
+    // Force localhost in development to avoid production redirects
+    const isDev = process.env.NODE_ENV === 'development'
+    const origin = isDev ? 'http://localhost:3000' : (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000')
+
+    console.log('OAuth Origin:', origin)
+
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback?next=/dashboard?login=success`,
+            redirectTo: `${origin}/auth/callback?next=/dashboard?login=success`,
         },
     })
 
