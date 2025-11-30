@@ -1,10 +1,22 @@
 import { createClient } from "@/lib/supabase/server";
 import { BlogCard } from "@/components/BlogCard";
 import { Post } from "@/types";
+import { redirect } from "next/navigation";
 
 export const revalidate = 60;
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const resolvedSearchParams = await searchParams;
+  const code = resolvedSearchParams?.code;
+
+  if (code) {
+    redirect(`/auth/callback?code=${code}&next=/dashboard?login=success`);
+  }
+
   const supabase = await createClient();
   const { data: posts } = await supabase
     .from("posts")
