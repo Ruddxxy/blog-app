@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Copperplate", "Copperplate Gothic Light", fantasy;
+  --font-sans: var(--font-eb-garamond);
   --color-background: #ffffff;
   --color-foreground: #000000;
 }
