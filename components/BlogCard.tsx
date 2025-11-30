@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Post } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -20,11 +21,15 @@ export function BlogCard({ post, className }: BlogCardProps) {
         <div>
           {post.cover_image_url && (
             <div className="mb-6 border-b border-black pb-6 -mx-6 px-6">
-              <img
-                src={post.cover_image_url}
-                alt={post.title}
-                className="w-full h-48 object-cover border border-black grayscale group-hover:grayscale-0 transition-all duration-300"
-              />
+              <div className="relative w-full h-48">
+                <Image
+                  src={post.cover_image_url}
+                  alt={post.title}
+                  fill
+                  className="object-cover border border-black grayscale group-hover:grayscale-0 transition-all duration-300"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
             </div>
           )}
           <h2 className="text-2xl font-bold tracking-tight mb-4 group-hover:text-white">

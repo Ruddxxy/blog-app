@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Post } from '@/types';
 import { redirect } from 'next/navigation';
+import DeletePostButton from '@/components/DeletePostButton';
 
 export const revalidate = 0;
 
@@ -13,10 +14,26 @@ export default async function AdminDashboard() {
     redirect('/login');
   }
 
-  const { data: posts } = await supabase
+  // Fetch user profile to check role
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .single();
+
+  const isAdmin = profile?.role === 'admin';
+
+  let query = supabase
     .from('posts')
     .select('*')
     .order('created_at', { ascending: false });
+
+  // If not admin, only show own posts
+  if (!isAdmin) {
+    query = query.eq('user_id', session.user.id);
+  }
+
+  const { data: posts } = await query;
 
   return (
     <div className="flex-1 flex flex-col">
@@ -42,13 +59,14 @@ export default async function AdminDashboard() {
                 </span>
               </div>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
               <Link 
                 href={`/admin/edit/${post.id}`}
                 className="text-sm font-bold uppercase tracking-widest hover:underline"
               >
                 Edit
               </Link>
+              <DeletePostButton postId={post.id} />
               <Link 
                 href={`/blog/${post.slug}`}
                 className="text-sm font-bold uppercase tracking-widest hover:underline"

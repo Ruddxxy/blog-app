@@ -1,0 +1,56 @@
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
+import { signOut } from '@/app/login/actions';
+
+export default async function Header() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let profile = null;
+  if (user) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    profile = data;
+  }
+
+  return (
+    <header className="border-b border-black p-6 flex justify-between items-center bg-white sticky top-0 z-50">
+      <Link href="/" className="text-xl font-bold uppercase tracking-widest hover:text-gray-600 transition-colors">
+        The Silent Archive
+      </Link>
+
+      <nav className="flex items-center gap-6 text-sm font-bold uppercase tracking-widest">
+        <Link href="/about" className="hover:underline">
+          About
+        </Link>
+        
+        {user ? (
+          <>
+            <Link href="/admin/create" className="hover:underline">
+              Create Post
+            </Link>
+            {profile?.role === 'admin' && (
+              <Link href="/admin" className="hover:underline">
+                Admin
+              </Link>
+            )}
+            <form action={signOut}>
+              <button type="submit" className="hover:underline cursor-pointer">
+                Logout
+              </button>
+            </form>
+          </>
+        ) : (
+          <Link href="/login" className="hover:underline">
+            Login
+          </Link>
+        )}
+      </nav>
+    </header>
+  );
+}

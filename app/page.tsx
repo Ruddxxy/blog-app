@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { BlogCard } from "@/components/BlogCard";
 import { Post } from "@/types";
 
-export const revalidate = 0; // Disable caching for now to see updates immediately
+export const revalidate = 60;
 
 export default async function Home() {
   const supabase = await createClient();

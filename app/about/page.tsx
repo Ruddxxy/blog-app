@@ -29,9 +29,6 @@ export default function AboutPage() {
               "To write is to carve meaning from the silence."
             </p>
           </div>
-          <p>
-            This platform is built with Next.js, Tailwind CSS, and Supabase. It is open source, transparent, and unapologetically raw.
-          </p>
         </div>
       </div>
     </div>

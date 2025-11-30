@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import Header from "@/components/Header";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -25,6 +26,7 @@ export default function RootLayout({
         className={`${inter.variable} antialiased bg-white text-black font-sans selection:bg-black selection:text-white`}
       >
         <div className="min-h-screen flex flex-col border-x border-black max-w-7xl mx-auto">
+          <Header />
           {children}
         </div>
         <Toaster />
