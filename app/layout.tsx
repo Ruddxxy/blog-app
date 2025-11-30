@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,6 +29,7 @@ export default function RootLayout({
         <div className="min-h-screen flex flex-col border-x border-black max-w-7xl mx-auto">
           <Header />
           {children}
+          <Footer />
         </div>
         <Toaster />
       </body>

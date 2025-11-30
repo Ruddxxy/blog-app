@@ -50,7 +50,7 @@ export async function signInWithOtp(email: string) {
         options: {
             // set this to false if you do not want the user to be automatically signed up
             shouldCreateUser: true,
-            emailRedirectTo: 'https://example.com/welcome',
+            emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
         },
     })
 
@@ -59,6 +59,42 @@ export async function signInWithOtp(email: string) {
     }
 
     return { success: true }
+}
+
+export async function signInWithGoogle() {
+    const supabase = await createClient()
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+        },
+    })
+
+    if (data.url) {
+        redirect(data.url)
+    }
+
+    if (error) {
+        return { error: error.message }
+    }
+}
+
+export async function signInWithGithub() {
+    const supabase = await createClient()
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+        },
+    })
+
+    if (data.url) {
+        redirect(data.url)
+    }
+
+    if (error) {
+        return { error: error.message }
+    }
 }
 
 export async function verifyOtp(email: string, token: string) {
