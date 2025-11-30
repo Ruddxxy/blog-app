@@ -16,7 +16,7 @@ export default async function DashboardPage() {
   // Fetch profile for username
   const { data: profile } = await supabase
     .from('profiles')
-    .select('username')
+    .select('username, avatar_url')
     .eq('id', user.id)
     .single();
 
@@ -28,12 +28,86 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex-1 p-8 max-w-5xl mx-auto w-full">
-      <header className="mb-12 border-b border-black pb-8 flex justify-between items-end">
-        <div>
-          <h1 className="text-5xl font-bold tracking-tighter mb-4">Dashboard</h1>
-          <p className="text-xl text-gray-600">
-            Welcome back, <span className="font-bold text-black">{profile?.username || user.email}</span>
-          </p>
+      <header className="mb-12 border-b border-black pb-8 flex flex-col md:flex-row justify-between items-end gap-6">
+        <div className="flex items-end gap-6">
+          {/* Avatar Upload */}
+          <div className="relative group w-24 h-24 border border-black bg-gray-100 flex-shrink-0">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-gray-300">
+                {profile?.username?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
+              </div>
+            )}
+            <form action={async (formData) => {
+              'use server';
+              const file = formData.get('avatar') as File;
+              if (!file || file.size === 0) return;
+              
+              // Strict Validation
+              if (!file.type.startsWith('image/')) {
+                // In a real app we'd return an error state, here we rely on client-side check mostly
+                // but server-side check is crucial.
+                return; 
+              }
+              if (file.size > 2 * 1024 * 1024) { // 2MB
+                return;
+              }
+
+              const supabase = await createClient();
+              const fileExt = file.name.split('.').pop();
+              // Sanitize filename
+              const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+              
+              const { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(fileName, file, { upsert: true });
+
+              if (!uploadError) {
+                const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
+                await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
+              }
+            }} className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 flex items-center justify-center cursor-pointer">
+              <input 
+                type="file" 
+                name="avatar" 
+                accept="image/*" 
+                className="absolute inset-0 cursor-pointer opacity-0"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (!file.type.startsWith('image/')) {
+                      alert('Please upload an image file.');
+                      e.target.value = '';
+                      return;
+                    }
+                    if (file.size > 2 * 1024 * 1024) {
+                      alert('File size must be less than 2MB.');
+                      e.target.value = '';
+                      return;
+                    }
+                    e.target.form?.requestSubmit();
+                  }
+                }}
+              />
+              <span className="text-white text-xs font-bold uppercase">Upload</span>
+            </form>
+          </div>
+
+          <div>
+            <h1 className="text-5xl font-bold tracking-tighter mb-4">Dashboard</h1>
+            <div className="flex gap-4 items-center">
+              <p className="text-xl text-gray-600">
+                Welcome back, <span className="font-bold text-black">{profile?.username || user.email}</span>
+              </p>
+              <Link 
+                href={`/user/${user.id}`}
+                className="text-xs font-bold uppercase tracking-widest border border-black px-2 py-1 hover:bg-black hover:text-white transition-colors"
+              >
+                View Public Profile
+              </Link>
+            </div>
+          </div>
         </div>
         
         {/* Username Update Form */}
