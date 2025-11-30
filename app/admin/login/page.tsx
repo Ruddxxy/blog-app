@@ -3,37 +3,36 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { login, signup } from '@/app/login/actions';
+import { adminLogin } from '@/app/admin/login/actions';
 
-export default function LoginPage() {
-  const [isLogin, setIsLogin] = useState(true);
+export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const action = isLogin ? login : signup;
-    const result = await action(formData);
+    const result = await adminLogin(formData);
 
     if (result?.error) {
       toast.error(result.error);
       setLoading(false);
     }
+    // Success redirect is handled by the server action
   };
 
   return (
     <div className="flex-1 flex items-center justify-center p-6">
       <div className="w-full max-w-md border-brutal p-8">
         <h1 className="text-3xl font-bold tracking-tight mb-8 text-center">
-          {isLogin ? 'Login' : 'Sign Up'}
+          Admin Access
         </h1>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <label className="block text-sm font-bold uppercase tracking-widest mb-2">
               Email
@@ -59,7 +58,6 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full border-brutal p-3 focus:outline-none focus:bg-black focus:text-white transition-colors"
               required
-              minLength={6}
             />
           </div>
 
@@ -68,18 +66,9 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-black text-white p-4 font-bold uppercase tracking-widest hover:bg-white hover:text-black border border-black transition-colors disabled:opacity-50"
           >
-            {loading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
+            {loading ? 'Authenticating...' : 'Enter Archive'}
           </button>
         </form>
-
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-sm font-bold uppercase tracking-widest hover:underline"
-          >
-            {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login"}
-          </button>
-        </div>
       </div>
     </div>
   );

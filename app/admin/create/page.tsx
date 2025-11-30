@@ -1,5 +1,7 @@
 import { PostForm } from '@/components/PostForm';
 
+export const dynamic = 'force-dynamic';
+
 export default function CreatePostPage() {
   return (
     <div className="flex-1 flex flex-col">
