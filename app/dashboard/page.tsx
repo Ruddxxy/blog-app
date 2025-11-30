@@ -3,11 +3,16 @@ import { updateProfile } from '@/app/actions/profile';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { toast } from 'sonner';
+import { DashboardToast } from './toast'; // New client component
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ login?: string }>;
+}) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const { login } = await searchParams;
 
   if (!user) {
     redirect('/login');
@@ -28,6 +33,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex-1 p-8 max-w-5xl mx-auto w-full">
+      {login === 'success' && <DashboardToast />}
+      
       <header className="mb-12 border-b border-black pb-8 flex flex-col md:flex-row justify-between items-end gap-6">
         <div className="flex items-end gap-6">
           {/* Avatar Upload */}
@@ -46,8 +53,6 @@ export default async function DashboardPage() {
               
               // Strict Validation
               if (!file.type.startsWith('image/')) {
-                // In a real app we'd return an error state, here we rely on client-side check mostly
-                // but server-side check is crucial.
                 return; 
               }
               if (file.size > 2 * 1024 * 1024) { // 2MB
@@ -164,7 +169,6 @@ export default async function DashboardPage() {
                 {stats.followersList.map((f: any) => (
                   <li key={f.follower_id} className="border-brutal p-4 flex justify-between items-center">
                     <span className="font-mono text-sm">{f.follower_id}</span>
-                    {/* Link to public profile would go here */}
                   </li>
                 ))}
               </ul>
@@ -195,27 +199,43 @@ export default async function DashboardPage() {
 
         {/* My Posts Column */}
         <section>
-          <h2 className="text-2xl font-bold tracking-tight mb-6 border-b border-black pb-2">
-            My Posts
-          </h2>
+          <div className="flex justify-between items-center mb-6 border-b border-black pb-2">
+            <h2 className="text-2xl font-bold tracking-tight">
+              My Posts
+            </h2>
+            <Link 
+              href="/posts/create" 
+              className="bg-black text-white px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black border border-black transition-colors"
+            >
+              Create New Post
+            </Link>
+          </div>
           {stats.posts.length === 0 ? (
             <div className="text-center py-12 border-brutal border-dashed">
               <p className="mb-4">You haven't written any posts yet.</p>
-              {/* Only show create button if we allow users to create, currently only admins */}
             </div>
           ) : (
             <div className="space-y-6">
               {stats.posts.map((post: any) => (
-                <article key={post.id} className="border-brutal p-6 hover:bg-gray-50 transition-colors">
+                <article key={post.id} className="border-brutal p-6 hover:bg-gray-50 transition-colors group">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-xl font-bold">{post.title}</h3>
                     <span className="text-xs font-mono text-gray-500">
                       {new Date(post.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="flex gap-4 text-sm font-bold uppercase tracking-widest text-gray-600">
+                  <div className="flex gap-4 text-sm font-bold uppercase tracking-widest text-gray-600 mb-4">
                     <span>{post.likes?.[0]?.count || 0} Likes</span>
                     <span>{post.comments?.[0]?.count || 0} Comments</span>
+                  </div>
+                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Link 
+                      href={`/posts/edit/${post.id}`}
+                      className="text-xs font-bold uppercase tracking-widest border border-black px-2 py-1 hover:bg-black hover:text-white transition-colors"
+                    >
+                      Edit
+                    </Link>
+                    {/* Delete would require a client component or form action */}
                   </div>
                 </article>
               ))}

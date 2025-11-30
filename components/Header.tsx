@@ -36,19 +36,8 @@ export default async function Header() {
         {user ? (
           <>
             <Link href="/dashboard" className="hover:underline">
-              Dashboard
+              Profile
             </Link>
-            <Link href={`/user/${user.id}`} className="hover:underline">
-              My Profile
-            </Link>
-            <Link href="/admin/create" className="hover:underline">
-              Create Post
-            </Link>
-            {profile?.role === 'admin' && (
-              <Link href="/admin" className="hover:underline">
-                Admin
-              </Link>
-            )}
             <form action={signOut}>
               <button type="submit" className="hover:underline cursor-pointer">
                 Logout

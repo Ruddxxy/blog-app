@@ -78,7 +78,7 @@ export function PostForm({ post }: PostFormProps) {
           .insert([postData]);
         if (error) throw error;
       }
-      router.push('/admin');
+      router.push('/dashboard');
       router.refresh();
       toast.success('Post saved successfully!');
     } catch (error: any) {

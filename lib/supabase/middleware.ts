@@ -44,6 +44,13 @@ export async function updateSession(request: NextRequest) {
         }
     }
 
+    // Protect /posts routes
+    if (request.nextUrl.pathname.startsWith('/posts')) {
+        if (!user) {
+            return NextResponse.redirect(new URL('/login', request.url))
+        }
+    }
+
     // Protect /admin routes
     if (request.nextUrl.pathname.startsWith('/admin')) {
         if (!user) {
