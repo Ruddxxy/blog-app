@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { signInWithGoogle, signInWithGithub } from './actions';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -10,13 +10,21 @@ export default function LoginPage() {
   const handleOAuth = async (provider: 'google' | 'github') => {
     setLoading(true);
     try {
-      const action = provider === 'google' ? signInWithGoogle : signInWithGithub;
-      const result = await action();
+      const supabase = createClient();
+      const origin = window.location.origin;
       
-      if (result?.error) {
-        toast.error(result.error);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${origin}/auth/callback?next=/dashboard?login=success`,
+        },
+      });
+      
+      if (error) {
+        toast.error(error.message);
         setLoading(false);
       }
+      // Note: No need to set loading false on success as it redirects
     } catch (err: any) {
       toast.error(err.message || 'An unexpected error occurred');
       setLoading(false);

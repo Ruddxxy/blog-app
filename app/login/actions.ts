@@ -2,19 +2,17 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 
 export async function signInWithGoogle() {
     const supabase = await createClient()
 
-    // Determine origin with robust fallbacks
-    const isDev = process.env.NODE_ENV === 'development'
-    let origin = isDev ? 'http://localhost:3000' : (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000')
-
-    // Fallback to VERCEL_URL if available and not in dev
-    if (!isDev && !process.env.NEXT_PUBLIC_SITE_URL && process.env.VERCEL_URL) {
-        origin = `https://${process.env.VERCEL_URL}`
-    }
+    // Determine origin dynamically from headers
+    const headersList = await headers()
+    const host = headersList.get('host')
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+    const origin = `${protocol}://${host}`
 
     console.log('OAuth Origin:', origin)
 
@@ -39,14 +37,11 @@ export async function signInWithGoogle() {
 export async function signInWithGithub() {
     const supabase = await createClient()
 
-    // Determine origin with robust fallbacks
-    const isDev = process.env.NODE_ENV === 'development'
-    let origin = isDev ? 'http://localhost:3000' : (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000')
-
-    // Fallback to VERCEL_URL if available and not in dev
-    if (!isDev && !process.env.NEXT_PUBLIC_SITE_URL && process.env.VERCEL_URL) {
-        origin = `https://${process.env.VERCEL_URL}`
-    }
+    // Determine origin dynamically from headers
+    const headersList = await headers()
+    const host = headersList.get('host')
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+    const origin = `${protocol}://${host}`
 
     console.log('OAuth Origin:', origin)
 
