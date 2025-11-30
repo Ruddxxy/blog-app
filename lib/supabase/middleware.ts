@@ -37,14 +37,17 @@ export async function updateSession(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     // Protect /admin routes
-    if (request.nextUrl.pathname.startsWith('/admin')) {
-        // Allow access to /admin/login
-        if (request.nextUrl.pathname === '/admin/login') {
-            return response
-        }
-
+    // Protect /dashboard routes
+    if (request.nextUrl.pathname.startsWith('/dashboard')) {
         if (!user) {
-            return NextResponse.redirect(new URL('/admin/login', request.url))
+            return NextResponse.redirect(new URL('/login', request.url))
+        }
+    }
+
+    // Protect /admin routes
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+        if (!user) {
+            return NextResponse.redirect(new URL('/login', request.url))
         }
 
         // Check for admin role

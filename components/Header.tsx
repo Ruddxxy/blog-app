@@ -31,6 +31,9 @@ export default async function Header() {
         
         {user ? (
           <>
+            <Link href="/dashboard" className="hover:underline">
+              Dashboard
+            </Link>
             <Link href="/admin/create" className="hover:underline">
               Create Post
             </Link>

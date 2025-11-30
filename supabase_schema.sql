@@ -1,16 +1,3 @@
--- Enable UUID extension
-create extension if not exists "uuid-ossp";
-
--- PROFILES TABLE (RBAC)
-create table public.profiles (
-  id uuid references auth.users on delete cascade primary key,
-  role text not null default 'user' check (role in ('admin', 'user')),
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
--- Enable RLS on profiles
-alter table public.profiles enable row level security;
-
 create policy "Public profiles are viewable by everyone."
   on profiles for select
   using ( true );
@@ -195,3 +182,27 @@ create policy "Authenticated Upload"
 on storage.objects for insert
 to authenticated
 with check ( bucket_id = 'blog-images' );
+
+-- FOLLOWS TABLE
+create table public.follows (
+  follower_id uuid references auth.users(id) not null,
+  following_id uuid references auth.users(id) not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  primary key (follower_id, following_id)
+);
+
+alter table public.follows enable row level security;
+
+create policy "Public can view follows"
+on public.follows for select
+using (true);
+
+create policy "Authenticated users can follow"
+on public.follows for insert
+to authenticated
+with check (auth.uid() = follower_id);
+
+create policy "Users can unfollow"
+on public.follows for delete
+to authenticated
+using (auth.uid() = follower_id);

@@ -45,8 +45,11 @@ export function Social({ postId, initialLikes, initialComments, userId, userRole
       return
     }
 
+    const content = formData.get('content') as string
+    if (!content) return
+
     startTransition(async () => {
-      const result = await addComment(formData)
+      const result = await addComment(postId, content)
       if (result?.error) {
         toast.error(result.error)
       } else {
