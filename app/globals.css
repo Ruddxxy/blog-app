@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-inter);
+  --font-sans: "Copperplate", "Copperplate Gothic Light", fantasy;
   --color-background: #ffffff;
   --color-foreground: #000000;
 }
@@ -11,7 +11,7 @@
   .border-brutal {
     @apply border border-black;
   }
-  
+
   .hover-inverse {
     @apply transition-colors duration-0 ease-linear hover:bg-black hover:text-white;
   }
@@ -26,6 +26,8 @@ body {
 }
 
 /* Ensure all borders are solid black by default if border width is set */
-*, ::before, ::after {
+*,
+::before,
+::after {
   border-color: #000000;
 }

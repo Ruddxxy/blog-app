@@ -31,7 +31,7 @@ export default function Footer() {
             About
           </Link>
           <Link href="/blog" className="text-lg font-bold hover:underline decoration-2 underline-offset-4 w-fit">
-            All Posts
+            Blog
           </Link>
         </div>
 
